@@ -1,0 +1,12 @@
+# Ten observable factors. kind: bp = absolute change in basis points, log = log-change.
+# Raw series are downloaded, never redistributed (Yahoo / Cboe / ICE licences): only derived outputs are versioned.
+eur_2y:   {source: ecb, key: "YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y",  kind: bp,  unit: "%"}
+eur_10y:  {source: ecb, key: "YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y", kind: bp,  unit: "%"}
+eur_sov_spread: {source: ecb_spread, all: "YC/B.U2.EUR.4F.G_N_C.SV_C_YM.SR_10Y", aaa: "YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y", kind: bp, unit: "%"}
+us_2y:    {source: fred, key: DGS2,     kind: bp,  unit: "%"}
+us_10y:   {source: fred, key: DGS10,    kind: bp,  unit: "%"}
+baa_spread: {source: fred, key: BAA10Y, kind: bp,  unit: "%"}
+vix:      {source: fred, key: VIXCLS,   kind: log, unit: "pts"}
+eurusd:   {source: fred, key: DEXUSEU,  kind: log, unit: "USD per EUR"}
+sx5e:     {source: yahoo, key: "^STOXX50E", kind: log, unit: "index"}
+spx:      {source: yahoo, key: "^GSPC",     kind: log, unit: "index"}

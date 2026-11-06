@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stress-engine"
+version = "0.1.0"
+description = "Multi-factor combined stress tests: crisis replay, conditional propagation, full revaluation vs sensitivities, reverse stress."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["numpy", "scipy", "pandas", "pyyaml", "scikit-learn", "requests", "riskhub-engine"]
+
+[project.optional-dependencies]
+data = ["yfinance"]
+check = ["QuantLib"]
+app = ["streamlit"]
+dev = ["pytest", "pytest-cov", "ruff"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "E701", "E702", "E731", "B905"]

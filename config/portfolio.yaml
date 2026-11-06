@@ -1,0 +1,13 @@
+# 100 MEUR NAV. Each line is exposed to observable factors only (no hidden proxy). Shocks are instantaneous (h = 0):
+# no theta, no expiry. Continuous compounding; rates r = US 2y, q = 0 for the S&P options.
+nav_eur: 100000000
+lines:
+  - {name: "Sovereign AAA euro 10y",          kind: bond,    ccy: EUR, nominal: 25000000, curve: eur, spread: null}
+  - {name: "Sovereign euro all ratings 10y",  kind: bond,    ccy: EUR, nominal: 10000000, curve: eur, spread: eur_sov_spread}
+  - {name: "UST 10y unhedged",                kind: bond,    ccy: USD, nominal: 15000000, curve: us,  spread: null}
+  - {name: "US IG corporate basket (Baa)",    kind: bond,    ccy: USD, nominal: 10000000, curve: us,  spread: baa_spread}
+  - {name: "Euro Stoxx 50 future",            kind: future,  ccy: EUR, nominal: 15000000, index: sx5e}
+  - {name: "S&P 500 future",                  kind: future,  ccy: USD, nominal: 10000000, index: spx}
+  - {name: "USD forward sale 3m",             kind: fxfwd,   ccy: USD, nominal: 10000000, months: 3}
+  - {name: "Long S&P put 3m, K 95%",          kind: option,  ccy: USD, nominal: 15000000, right: put,  months: 3, moneyness: 0.95}
+  - {name: "Short S&P call 1m, K 105%",       kind: option,  ccy: USD, nominal: -10000000, right: call, months: 1, moneyness: 1.05}
