@@ -14,7 +14,7 @@ dependencies = ["numpy", "scipy", "pandas", "pyyaml", "scikit-learn", "requests"
 data = ["yfinance"]
 check = ["QuantLib"]
 app = ["streamlit"]
-dev = ["pytest", "pytest-cov", "pytest-cov", "ruff"]
+dev = ["pytest", "pytest-cov", "ruff"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
