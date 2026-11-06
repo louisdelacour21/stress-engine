@@ -1,0 +1,13 @@
+regime,scenario,pnl_pct_nav,d,cond_Sss,alert_cond_gt_1e6
+full,stagflation,-8.117,13.116,237788.096,False
+full,fragmentation,-0.637,16.567,1.0,False
+full,flight_to_quality,-1.865,5.68,1.0,False
+full,strong_dollar,1.383,9.804,902523.421,False
+stressed,stagflation,-8.028,9.946,139267.596,False
+stressed,fragmentation,-0.027,9.484,1.0,False
+stressed,flight_to_quality,-1.736,2.785,1.0,False
+stressed,strong_dollar,1.588,7.168,521087.118,False
+post2021,stagflation,-7.858,10.7,430917.484,False
+post2021,fragmentation,-4.256,27.093,1.0,False
+post2021,flight_to_quality,-2.644,7.339,1.0,False
+post2021,strong_dollar,0.19,10.503,2227924.054,True

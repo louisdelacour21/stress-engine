@@ -1,16 +1,17 @@
-"""Rolling out-of-sample test of the conditional propagation on non-overlapping h-day periods.
+"""Rolling out-of-sample test (nu=None: Gaussian; nu=5 etc.: multivariate Student-t, nu fixed a priori, never tuned) of the conditional propagation on non-overlapping h-day periods.
 
 For each period t: Sigma estimated on data strictly before t, condition on the realised change of the pilot factor,
 predict the others; PIT_k = Phi((x_k - m_k)/s_k). Under a correct model PIT ~ U(0,1)."""
 import numpy as np
 import pandas as pd
 from scipy.stats import kstest, norm
+from scipy.stats import t as student
 
 from .covariance import ewma, propagate
 from .data import changes
 
 
-def run(pilot="sx5e", h=10, start="2007-12-31", lam=0.97, df=None):
+def run(pilot="sx5e", h=10, start="2007-12-31", lam=0.97, df=None, nu=None):
     dx1 = changes(df, 1)
     dxh = changes(df, h)
     idx = dxh.index[::h]  # non-overlapping windows
@@ -26,7 +27,12 @@ def run(pilot="sx5e", h=10, start="2007-12-31", lam=0.97, df=None):
         sd = np.sqrt(np.diag(C))
         u = [c for c in S.columns if c != pilot]
         z = (x[u].to_numpy() - m[u].to_numpy()) / sd
-        rows.append(pd.Series(norm.cdf(z), u, name=t))
+        if nu is None:
+            pit = norm.cdf(z)
+        else:  # conditional t: nu+k dof, scale (nu-2)/nu * C * (nu + d2)/(nu + k), d2 in the scale-matrix metric
+            d2 = d * d * nu / (nu - 2)
+            pit = student.cdf(z / np.sqrt((nu - 2) / nu * (nu + d2) / (nu + 1)), nu + 1)
+        rows.append(pd.Series(pit, u, name=t))
     return pd.DataFrame(rows)
 
 

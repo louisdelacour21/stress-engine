@@ -17,6 +17,9 @@ app = ["streamlit"]
 media = ["matplotlib", "pillow"]
 dev = ["pytest", "pytest-cov", "ruff"]
 
+[project.scripts]
+stress-engine = "stress_engine.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

@@ -1,5 +1,6 @@
 """Validation report (PDF) and demo GIF, both drawn from outputs/ only."""
 import io
+import json
 import textwrap
 
 import matplotlib
@@ -37,6 +38,10 @@ def _text_page(pdf, title, body):
 
 def report():
     sc, bt = pd.read_csv(OUTD / "scenarios.csv"), pd.read_csv(OUTD / "backtest.csv", index_col=[0, 1])
+    t5 = pd.read_csv(OUTD / "backtest_t5.csv", index_col=[0, 1])
+    rg = pd.read_csv(OUTD / "regimes.csv")
+    lq = json.loads((OUTD / "meta.json").read_text())["lqd"]
+    frag = rg[rg.scenario == "fragmentation"].set_index("regime").pnl_pct_nav
     rv = pd.read_csv(OUTD / "reverse.csv")
     ks_rej = (bt.ks_p < 0.05).mean()
     findings = (f"Finding 1 (material). The Gaussian propagation is rejected by the KS test at 5 % for {ks_rej:.0%} of the "
@@ -47,6 +52,12 @@ def report():
                 f"{rv.set_index('loss_pct_nav').loc[10, 'd_full']:.1f} full revaluation).\n\n"
                 f"Finding 3. Taylor order 2 raises the alert on {int(sc.alert.sum())} of {len(sc)} scenarios: do not use sensitivities "
                 "for the crisis-sized moves of the book (options and convexity).\n\n"
+                f"Finding 4. A Student-t propagation (nu = 5, fixed in advance, not tuned) lowers the KS rejection rate from {ks_rej:.0%} "
+                f"to {(t5.ks_p < 0.05).mean():.0%}: a partial fix, tails are not the only problem.\n\n"
+                f"Finding 5. The result depends on the covariance regime: the fragmentation scenario costs {frag['full']:.1f} % of NAV "
+                f"with the full sample, {frag['stressed']:.1f} % with stressed periods and {frag['post2021']:.1f} % since 2021.\n\n"
+                f"Finding 6. The US corporate basket line is modelled with the BAA10Y spread; LQD regressed on it implies a duration of "
+                f"{lq['implied_duration']:.1f} (R2 {lq['r2']:.2f}, 10-day tracking error {lq['tracking_error_10d_pct']:.1f} %): large basis risk.\n\n"
                 "Opinion. Fit for use as an exploratory stress tool with the conditions above; not fit to produce a probability.")
     with PdfPages(OUTD / "validation_report.pdf") as pdf:
         _text_page(pdf, "stress-engine: validation report (self-review)", SCOPE + "\n\n" + findings)

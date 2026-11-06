@@ -49,3 +49,40 @@ def test_media_written():
     media.report()
     media.gif()
     assert (media.OUTD / "validation_report.pdf").stat().st_size > 5000 and (media.ROOT / "docs" / "demo.gif").exists()
+
+
+def test_greeks_do_not_depend_on_bump_size():
+    from stress_engine import sensitivities as SE
+    pf = P.today()
+    g1, _ = SE.greeks(pf)
+    old = SE._step
+    try:
+        SE._step = lambda f: 2 * old(f)
+        g2, _ = SE.greeks(pf)
+    finally:
+        SE._step = old
+    assert np.allclose(g1, g2, rtol=2e-2, atol=2e2)  # EUR per factor unit
+
+
+def test_fiche_dv01_of_the_reference_bond():
+    from stress_engine.portfolio import bond_price
+    dv = (bond_price(0.0251, 0.0251, 0.0, 0.025)[0] - bond_price(0.0249, 0.0249, 0.0, 0.025)[0]) / 2 * 100  # per 100 bp
+    assert dv == pytest.approx(-8.94, abs=0.02)
+
+
+def test_cli_scenario_and_unknown_factor(capsys):
+    from stress_engine.cli import main
+    main(["scenario", "sx5e=-0.2"])
+    assert "total" in capsys.readouterr().out
+    with pytest.raises(SystemExit):
+        main(["scenario", "nope=1"])
+
+
+def test_bands_and_regimes_and_t_backtest():
+    from stress_engine import analysis, backtest, scenarios
+    pf, S = P.today(), C.estimate("full", 10)
+    b = analysis.pnl_band(pf, S, scenarios.hypothetical()["flight_to_quality"], n=500)
+    assert b["p05"] < b["p50"] < b["p95"]
+    assert set(analysis.regimes_table(pf, scenarios.hypothetical()).regime) == set(C.REGIMES)
+    assert 0.5 < backtest.summary(backtest.run("sx5e", nu=5)).cover90.min() < 1
+    assert analysis.lqd_tracking()["r2"] < 0.5 and not analysis.factor_stats().empty
