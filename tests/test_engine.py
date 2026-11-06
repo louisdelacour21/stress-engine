@@ -42,3 +42,10 @@ def test_reproduce_writes_outputs():
     run.main()
     for f in ("scenarios.csv", "reverse.csv", "backtest.csv", "spot_vol_grid.csv", "cascade.csv", "summary.html", "meta.json"):
         assert (run.OUT / f).stat().st_size > 0
+
+
+def test_media_written():
+    from stress_engine import media
+    media.report()
+    media.gif()
+    assert (media.O / "validation_report.pdf").stat().st_size > 5000 and (media.ROOT / "docs" / "demo.gif").exists()

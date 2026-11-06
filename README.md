@@ -20,5 +20,6 @@ make reproduce      # ~20 s, writes outputs/
 pytest
 ```
 Also: QuantLib bond check (gap 0.0098 % of nominal), spot x vol grid, asset-class cascade with cross term, Streamlit app on precomputed outputs (`streamlit run app.py`), coverage 94 %.
-Not done: Student copula, Shapley attribution, stressed ES, EBA mapping, GIF, PDF validation report, live demo link.
+Media: `python -m stress_engine.media` writes `outputs/validation_report.pdf` and `docs/demo.gif`.
+Not done: Student copula, Shapley attribution, stressed ES, EBA mapping, live demo link.
 MIT licence.
