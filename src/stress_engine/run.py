@@ -5,7 +5,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from . import backtest, data, reverse, scenarios
+from . import backtest, checks, data, reverse, scenarios
 from . import covariance as cov
 from . import portfolio as P
 from .sensitivities import error_alert
@@ -36,14 +36,19 @@ def main():
                      **{n: v / 1e6 for n, v in zip(names, pnl)}})
     pd.DataFrame(rows).to_csv(OUT / "scenarios.csv", index=False)
     pd.DataFrame(reverse.curve(pf, S), columns=["loss_pct_nav", "d_linear", "d_full"]).to_csv(OUT / "reverse.csv", index=False)
+    checks.spot_vol_grid(pf).round(3).to_csv(OUT / "spot_vol_grid.csv")
+    hist = scenarios.historical()
+    pd.DataFrame({k: checks.cascade(pf, hist.loc[k].fillna(0).to_numpy()) for k in hist.index}).T.round(3).to_csv(OUT / "cascade.csv")
     bt = pd.concat({p: backtest.summary(backtest.run(p)) for p in ("sx5e", "us_10y")})
     bt.to_csv(OUT / "backtest.csv")
-    meta = {"panel_fingerprint": data.fingerprint(data.panel()), "seconds": round(time.time() - t0, 1)}
+    meta = {"bond_gap_pct_nominal_vs_quantlib": round(checks.bond_gap_pct_nominal(), 5), "panel_fingerprint": data.fingerprint(data.panel()), "seconds": round(time.time() - t0, 1)}
     (OUT / "meta.json").write_text(json.dumps(meta, indent=1))
     sc_df = pd.read_csv(OUT / "scenarios.csv")
     html = ("<!doctype html><meta charset=utf-8><title>Stress engine summary</title><h1>Stress engine: morning summary</h1>"
             "<p>Self-review, synthetic 100 MEUR portfolio. Instantaneous shocks (no theta). Gaussian propagation: see backtest.</p>"
             + sc_df[["scenario", "pnl_pct_nav", "mahalanobis_d", "taylor2_error_pct_nav", "alert"]].round(2).to_html(index=False)
+            + "<h2>Spot x vol grid (% NAV)</h2>" + pd.read_csv(OUT / "spot_vol_grid.csv", index_col=0).to_html()
+            + "<h2>Asset-class cascade (% NAV)</h2>" + pd.read_csv(OUT / "cascade.csv", index_col=0).to_html()
             + "<h2>Reverse stress</h2>" + pd.read_csv(OUT / "reverse.csv").round(2).to_html(index=False)
             + "<h2>Propagation backtest</h2>" + bt.round(3).to_html())
     (OUT / "summary.html").write_text(html, encoding="utf-8")

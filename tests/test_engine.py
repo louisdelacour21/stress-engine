@@ -26,3 +26,19 @@ def test_wilson_and_berkowitz_on_iid_uniform():
     lo, hi = wilson(90, 100)
     assert lo < 0.9 < hi
     assert berkowitz(np.random.default_rng(1).uniform(size=800))[1] > 0.01
+
+
+def test_bond_agrees_with_quantlib_and_cascade_adds_up():
+    pytest.importorskip("QuantLib")
+    from stress_engine import checks
+    assert checks.bond_gap_pct_nominal() < 0.02  # % of nominal; ACT/365 vs whole-year discounting
+    pf = P.today()
+    c = checks.cascade(pf, np.r_[50, 50, 10, 50, 50, 5, 0.2, -0.05, -0.2, -0.2])
+    assert sum(v for k, v in c.items() if k != "total") == pytest.approx(c["total"])
+
+
+def test_reproduce_writes_outputs():
+    from stress_engine import run
+    run.main()
+    for f in ("scenarios.csv", "reverse.csv", "backtest.csv", "spot_vol_grid.csv", "cascade.csv", "summary.html", "meta.json"):
+        assert (run.OUT / f).stat().st_size > 0

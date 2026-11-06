@@ -19,5 +19,6 @@ pip install -e ".[data,dev]"
 make reproduce      # ~20 s, writes outputs/
 pytest
 ```
-Not done: Student copula, Shapley attribution, stressed ES, EBA mapping, Streamlit demo, GIF, validation report.
+Also: QuantLib bond check (gap 0.0098 % of nominal), spot x vol grid, asset-class cascade with cross term, Streamlit app on precomputed outputs (`streamlit run app.py`), coverage 94 %.
+Not done: Student copula, Shapley attribution, stressed ES, EBA mapping, GIF, PDF validation report, live demo link.
 MIT licence.

@@ -1,4 +1,5 @@
 {
+ "bond_gap_pct_nominal_vs_quantlib": 0.00976,
  "panel_fingerprint": "729f210b935837fd",
- "seconds": 20.3
+ "seconds": 12.9
 }
