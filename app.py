@@ -14,7 +14,7 @@ from stress_engine import portfolio as P  # noqa: E402
 OUTD = Path(__file__).parent / "outputs"
 st.set_page_config(page_title="Stress engine", layout="wide")
 st.title("Stress engine")
-st.caption("Self-review. Instantaneous shocks, no raw market data redistributed. Tab 1 revalues YOUR positions live; the other tabs are precomputed on a synthetic 100 MEUR book.")
+st.caption("Self-review. Instantaneous shocks, no raw market data redistributed. Stress lab and Crisis scenarios revalue YOUR positions live (default: a synthetic 100 MEUR book); the Ref tabs are precomputed.")
 SNAP = json.loads((OUTD / "snapshot.json").read_text())
 FACT = SNAP["factors"]
 sc = pd.read_csv(OUTD / "scenarios.csv")
