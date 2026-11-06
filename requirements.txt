@@ -1,3 +1,7 @@
 streamlit
 pandas
+numpy
+scipy
+pyyaml
+requests
 matplotlib

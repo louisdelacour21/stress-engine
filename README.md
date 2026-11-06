@@ -9,6 +9,15 @@ propagation itself.
 **Status: self-review by the author, synthetic portfolio, not an independent validation.** Results as of 2026-11-06
 (panel fingerprint `729f210b935837fd`, data through the last available close).
 
+**Live demo: https://stress-engine-ld.streamlit.app/** (enter your own positions, shock spot, vol, rates, spreads and FX together).
+
+The **Stress lab** revalues an editable portfolio under a combined shock set with sliders (equity %, VIX points, EUR/US rates bp,
+sovereign and credit spreads bp, EURUSD %): P&L by line and by driver (with the cross terms), the evolution of every line as the
+shock builds, VaR and ES 99 % 10-day before and after the shock (Gaussian or Student-t, normal or stressed covariance), ES
+contribution by line, and a two-driver P&L grid. Unshocked factors move to their conditional expectation (switchable). VaR and ES
+after the shock are the risk of the same book revalued from the shocked market (no rebalancing). An equity line is a stock proxied
+by an index with a user-chosen beta: there are no live prices.
+
 ![demo](docs/demo.gif)
 
 ## Results
@@ -53,9 +62,9 @@ make reproduce                          # about 15 s, rewrites outputs/
 stress-engine scenario eur_10y=150 sx5e=-0.15 --regime stressed
 stress-engine reverse 10                # most plausible move losing 10 % of NAV
 stress-engine bench                     # 100k full revaluations
-streamlit run app.py                    # demo on the precomputed outputs
+streamlit run app.py                    # live portfolio + stress lab, reads outputs/snapshot.json
 ```
-Raw series are not redistributed (Yahoo, Cboe, ICE licences): the loaders download them and `outputs/` holds derived numbers only. Tests: 15, coverage above 90 %, CI on every push.
+Raw series are not redistributed (Yahoo, Cboe, ICE licences): the loaders download them and `outputs/` holds derived numbers only. Tests: 18, coverage above 90 %, CI on every push.
 
 ## Not done
 Student copula for the joint shocks, Shapley attribution, stressed expected shortfall, EBA mapping, full vol surface, BTP-Bund spread.

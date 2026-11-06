@@ -37,10 +37,11 @@ def bs(S, K, T, r, sig, right):
 @dataclass
 class Portfolio:
     state: dict  # factor levels today (percent, index, ...)
+    lines: list | None = None  # default: config/portfolio.yaml
 
     def __post_init__(self):
         s = self.state
-        self.lines = CFG["lines"]
+        self.lines = self.lines or CFG["lines"]
         self.coupon = {}
         for L in self.lines:
             if L["kind"] == "bond":
@@ -67,7 +68,7 @@ class Portfolio:
                 sp = s[L["spread"]] / 100 + x[:, IDX[L["spread"]]] / 1e4 if L["spread"] else 0.0
                 v = n * bond_price(y2, y10, sp, self.coupon[L["name"]]) / 100
             elif k == "future":
-                v = n * np.exp(x[:, IDX[L["index"]]])
+                v = n * np.exp(L.get("beta", 1.0) * x[:, IDX[L["index"]]])  # beta: single stock proxied by its index
             elif k == "fxfwd":
                 T = L["months"] / 12
                 rE = s["eur_2y"] / 100 + x[:, IDX["eur_2y"]] / 1e4

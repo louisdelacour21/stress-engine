@@ -18,7 +18,7 @@ def main():
     OUT.mkdir(exist_ok=True)
     pf, S = P.today(), cov.estimate("full", 10)
     names = [L["name"] for L in pf.lines]
-    rows = []
+    rows, shocks = [], {}
     for k, sh in {**{f"hist:{k}": v.to_dict() for k, v in scenarios.historical().iterrows()},
                   **{f"hypo:{k}": v for k, v in scenarios.hypothetical().items()}}.items():
         partial = {f: v for f, v in sh.items() if f in data.FACTORS and not np.isnan(v)}
@@ -29,12 +29,16 @@ def main():
         else:
             m, _, d, cond = cov.propagate(S, partial)
             x = m.to_numpy()
+        shocks[k] = [float(v) for v in x]
         pnl = pf.pnl(x)[0]
         e, alert = error_alert(pf, x, 2)
         rows.append({"scenario": k, "pnl_pct_nav": pnl.sum() / P.NAV * 100, "mahalanobis_d": d,
                      "taylor2_error_pct_nav": float(e[0]) / P.NAV * 100, "alert": bool(alert[0]),
                      **{n: v / 1e6 for n, v in zip(names, pnl)}})
     pd.DataFrame(rows).to_csv(OUT / "scenarios.csv", index=False)
+    # derived inputs for the live portfolio tab of app.py (no raw series): today's levels, scenario shock vectors, covariance
+    (OUT / "snapshot.json").write_text(json.dumps({"state": {k: float(v) for k, v in pf.state.items()}, "shocks": shocks,
+                                                   "cov": S.to_dict(), "cov_stressed": cov.estimate("stressed", 10).to_dict(), "factors": data.FACTORS}))
     pd.DataFrame(reverse.curve(pf, S), columns=["loss_pct_nav", "d_linear", "d_full"]).to_csv(OUT / "reverse.csv", index=False)
     checks.spot_vol_grid(pf).round(3).to_csv(OUT / "spot_vol_grid.csv")
     hist = scenarios.historical()
