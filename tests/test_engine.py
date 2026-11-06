@@ -48,4 +48,4 @@ def test_media_written():
     from stress_engine import media
     media.report()
     media.gif()
-    assert (media.O / "validation_report.pdf").stat().st_size > 5000 and (media.ROOT / "docs" / "demo.gif").exists()
+    assert (media.OUTD / "validation_report.pdf").stat().st_size > 5000 and (media.ROOT / "docs" / "demo.gif").exists()

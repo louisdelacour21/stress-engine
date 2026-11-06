@@ -12,7 +12,7 @@ from PIL import Image  # noqa: E402
 
 from .data import ROOT  # noqa: E402
 
-O = ROOT / "outputs"
+OUTD = ROOT / "outputs"
 SCOPE = """Scope. Synthetic 100 MEUR book, nine lines, ten observable factors, instantaneous shocks (no theta, no expiry).
 
 Status. Self-review by the author: not an independent validation.
@@ -36,8 +36,8 @@ def _text_page(pdf, title, body):
 
 
 def report():
-    sc, bt = pd.read_csv(O / "scenarios.csv"), pd.read_csv(O / "backtest.csv", index_col=[0, 1])
-    rv = pd.read_csv(O / "reverse.csv")
+    sc, bt = pd.read_csv(OUTD / "scenarios.csv"), pd.read_csv(OUTD / "backtest.csv", index_col=[0, 1])
+    rv = pd.read_csv(OUTD / "reverse.csv")
     ks_rej = (bt.ks_p < 0.05).mean()
     findings = (f"Finding 1 (material). The Gaussian propagation is rejected by the KS test at 5 % for {ks_rej:.0%} of the "
                 f"factor/pilot pairs ({len(bt)} tested, n = {int(bt.n.iloc[0])} periods each). The nominal 90 % band covers "
@@ -48,7 +48,7 @@ def report():
                 f"Finding 3. Taylor order 2 raises the alert on {int(sc.alert.sum())} of {len(sc)} scenarios: do not use sensitivities "
                 "for the crisis-sized moves of the book (options and convexity).\n\n"
                 "Opinion. Fit for use as an exploratory stress tool with the conditions above; not fit to produce a probability.")
-    with PdfPages(O / "validation_report.pdf") as pdf:
+    with PdfPages(OUTD / "validation_report.pdf") as pdf:
         _text_page(pdf, "stress-engine: validation report (self-review)", SCOPE + "\n\n" + findings)
         fig, ax = plt.subplots(1, 2, figsize=(11.69, 5))
         sc.set_index("scenario").pnl_pct_nav.plot.barh(ax=ax[0], title="P&L, % NAV")
@@ -62,7 +62,7 @@ def report():
 
 
 def gif():
-    sc = pd.read_csv(O / "scenarios.csv")
+    sc = pd.read_csv(OUTD / "scenarios.csv")
     cols = sc.columns[5:]
     frames = []
     for _, r in sc.iterrows():
